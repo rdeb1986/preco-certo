@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Preço Certo</title>
+<meta name="theme-color" content="#14532d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Preço Certo">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#1c1f1a; --muted:#6b7064; --line:#e6e2d8;
+    --brand:#14532d; --brand-2:#1f7a45; --accent:#f2b705; --promo:#c2410c; --ok:#15803d; --bad:#b91c1c;
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#121411; --card:#1b1e1a; --ink:#eef0ea; --muted:#9aa093; --line:#2a2e28;
+      --brand:#22c55e; --brand-2:#4ade80; --promo:#fb923c; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.15)}
+  @media (prefers-color-scheme: dark){ header{background:#0f2a1a} }
+  .titulo{display:flex;align-items:baseline;gap:8px;margin:0 0 10px}
+  .titulo b{font-size:20px;letter-spacing:-.3px}
+  .titulo span{font-size:12px;opacity:.8}
+  form{display:flex;gap:8px}
+  input[type=search]{flex:1;min-width:0;border:0;border-radius:12px;padding:12px 14px;font-size:16px;
+    background:#fff;color:#1c1f1a;outline:none}
+  button.buscar{border:0;border-radius:12px;padding:0 16px;font-weight:700;font-size:15px;
+    background:var(--accent);color:#1c1f1a;cursor:pointer}
+  button.buscar:disabled{opacity:.6}
+  main{padding:12px 16px 40px;max-width:720px;margin:0 auto}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+  .chip{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;
+    border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer}
+  .filtros{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+  .toggle{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;user-select:none}
+  .toggle input{accent-color:var(--brand);margin:0}
+  select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;
+    padding:6px 10px;font-size:13px}
+  .mercados{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+  .mercado-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;
+    font-size:13px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+  .mercado-chip.off{opacity:.4;text-decoration:line-through}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+  .status{font-size:12px;color:var(--muted);margin:0 0 10px;display:flex;flex-wrap:wrap;gap:4px 12px}
+  .status .erro{color:var(--bad)}
+  .card{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px;margin:0 0 10px;position:relative}
+  .card.melhor{border:2px solid var(--brand-2)}
+  .selo{position:absolute;top:-9px;left:12px;background:var(--brand-2);color:#fff;font-size:11px;font-weight:700;
+    padding:2px 8px;border-radius:999px}
+  .foto{width:72px;height:72px;flex:none;border-radius:10px;background:#fff;object-fit:contain;border:1px solid var(--line)}
+  .foto.vazia{display:flex;align-items:center;justify-content:center;color:#aaa;font-size:22px}
+  .info{flex:1;min-width:0}
+  .loja{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted)}
+  .nome{margin:2px 0 6px;font-size:14px;line-height:1.3;word-wrap:break-word}
+  .precos{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .preco{font-size:20px;font-weight:800;letter-spacing:-.3px}
+  .de{font-size:13px;color:var(--muted);text-decoration:line-through}
+  .off{font-size:12px;font-weight:700;color:#fff;background:var(--promo);padding:1px 7px;border-radius:6px}
+  .unid{font-size:12px;color:var(--muted)}
+  .indisp{font-size:12px;color:var(--bad)}
+  .ver{display:inline-block;margin-top:6px;font-size:13px;color:var(--brand-2);text-decoration:none;font-weight:600}
+  .vazio{text-align:center;color:var(--muted);padding:40px 10px}
+  .vazio b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+  .carregando{display:flex;flex-direction:column;gap:10px}
+  .esqueleto{height:96px;border-radius:var(--radius);background:linear-gradient(90deg,var(--card),var(--line),var(--card));
+    background-size:200% 100%;animation:brilho 1.2s infinite}
+  @keyframes brilho{to{background-position:-200% 0}}
+  footer{font-size:11px;color:var(--muted);text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<header>
+  <div class="titulo"><b>Preço Certo</b><span>Americana · Santa Bárbara</span></div>
+  <form id="form">
+    <input id="q" type="search" placeholder="O que você procura? Ex.: café 500g" autocomplete="off" enterkeyhint="search">
+    <button class="buscar" id="btn" type="submit">Buscar</button>
+  </form>
+  <div class="chips" id="recentes"></div>
+</header>
+
+<main>
+  <div class="filtros">
+    <label class="toggle"><input type="checkbox" id="soPromo"> Só promoções</label>
+    <label class="toggle"><input type="checkbox" id="soDisp" checked> Só disponíveis</label>
+    <select id="ordem" aria-label="Ordenar">
+      <option value="preco">Menor preço</option>
+      <option value="unidade">Menor preço por kg/L</option>
+      <option value="desconto">Maior desconto</option>
+    </select>
+  </div>
+  <div class="mercados" id="mercados"></div>
+  <div class="status" id="status"></div>
+  <div id="lista">
+    <div class="vazio"><b>Pesquise um produto</b>Os preços dos mercados cadastrados aparecem aqui, do mais barato ao mais caro.</div>
+  </div>
+  <footer>Preços tirados dos sites das lojas online. Podem variar na loja física. Confira no site antes de comprar.</footer>
+</main>
+
+<script>
+  var dados = null;
+  var desligados = {};
+  var MAX_RECENTES = 8;
+
+  function $(id){ return document.getElementById(id); }
+  function brl(n){ return 'R$ ' + Number(n).toFixed(2).replace('.', ','); }
+  function esc(s){ return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  // ----- buscas recentes (guardadas só neste celular) -----
+  function lerRecentes(){ try { return JSON.parse(localStorage.getItem('recentes') || '[]'); } catch(e){ return []; } }
+  function salvarRecente(t){
+    try {
+      var r = lerRecentes().filter(function(x){ return x.toLowerCase() !== t.toLowerCase(); });
+      r.unshift(t); localStorage.setItem('recentes', JSON.stringify(r.slice(0, MAX_RECENTES)));
+    } catch(e){}
+    mostrarRecentes();
+  }
+  function mostrarRecentes(){
+    var r = lerRecentes();
+    $('recentes').innerHTML = r.map(function(t){
+      return '<button type="button" class="chip" data-t="' + esc(t) + '">' + esc(t) + '</button>';
+    }).join('');
+  }
+  $('recentes').addEventListener('click', function(e){
+    var t = e.target.getAttribute('data-t');
+    if (t){ $('q').value = t; buscar(t); }
+  });
+
+  // ----- mercados -----
+  // Endereço do servidor (Google Apps Script). Se um dia mudar, é só trocar aqui.
+  var API = 'https://script.google.com/macros/s/AKfycbwnmE8Snu4q-4e2C_KBM3M96e0OmUw7goRSHxV2lbKB8wrVczW2nn_TPftUe3xEg6ns/exec';
+
+  function chamar(acao, termo){
+    var url = API + '?acao=' + acao + (termo ? '&q=' + encodeURIComponent(termo) : '');
+    return fetch(url).then(function(r){
+      if (!r.ok) throw new Error('Servidor respondeu ' + r.status);
+      return r.json();
+    }).then(function(j){
+      if (j && j.erro) throw new Error(j.erro);
+      return j;
+    });
+  }
+
+  chamar('mercados').then(function(lista){
+    $('mercados').innerHTML = lista.map(function(m){
+      return '<button type="button" class="mercado-chip" data-m="' + esc(m.nome) + '"><span class="dot" style="background:' + m.cor + '"></span>' + esc(m.nome) + '</button>';
+    }).join('');
+  }).catch(function(){});
+  $('mercados').addEventListener('click', function(e){
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    var n = b.getAttribute('data-m');
+    desligados[n] = !desligados[n];
+    b.classList.toggle('off', !!desligados[n]);
+    desenhar();
+  });
+
+  // ----- busca -----
+  $('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var t = $('q').value.trim();
+    if (t.length >= 2) buscar(t);
+  });
+  ['soPromo','soDisp','ordem'].forEach(function(id){ $(id).addEventListener('change', desenhar); });
+
+  function buscar(t){
+    $('q').blur();
+    $('btn').disabled = true;
+    $('status').innerHTML = 'Consultando os mercados…';
+    $('lista').innerHTML = '<div class="carregando"><div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div></div>';
+    salvarRecente(t);
+    chamar('buscar', t)
+      .then(function(r){ $('btn').disabled = false; dados = r; desenhar(); })
+      .catch(function(err){
+        $('btn').disabled = false;
+        $('status').innerHTML = '';
+        $('lista').innerHTML = '<div class="vazio"><b>Não deu certo desta vez</b>' + esc(err && err.message || err) + '<br>Confira a internet e tente de novo.</div>';
+      });
+  }
+
+  function desenhar(){
+    if (!dados) return;
+    $('status').innerHTML = dados.status.map(function(s){
+      return s.ok
+        ? '<span><span class="dot" style="background:' + s.cor + '"></span> ' + esc(s.mercado) + ': ' + s.qtd + ' itens</span>'
+        : '<span class="erro"><span class="dot" style="background:' + s.cor + '"></span> ' + esc(s.mercado) + ': não respondeu</span>';
+    }).join('');
+
+    var soPromo = $('soPromo').checked, soDisp = $('soDisp').checked, ordem = $('ordem').value;
+    var lista = dados.produtos.filter(function(p){
+      if (desligados[p.mercado]) return false;
+      if (soPromo && !p.desconto) return false;
+      if (soDisp && p.disponivel === false) return false;
+      return true;
+    });
+
+    if (ordem === 'unidade'){
+      lista.sort(function(a,b){
+        var ua = a.porUnidade ? a.porUnidade.valor : Infinity, ub = b.porUnidade ? b.porUnidade.valor : Infinity;
+        return ua - ub || a.preco - b.preco;
+      });
+    } else if (ordem === 'desconto'){
+      lista.sort(function(a,b){ return (b.desconto||0) - (a.desconto||0) || a.preco - b.preco; });
+    } else {
+      lista.sort(function(a,b){ return a.preco - b.preco; });
+    }
+
+    if (!lista.length){
+      $('lista').innerHTML = '<div class="vazio"><b>Nada encontrado para "' + esc(dados.termo) + '"</b>' +
+        (soPromo ? 'Tente desligar "Só promoções".' : 'Tente uma palavra mais simples, como "café" em vez de "café pilão tradicional".') + '</div>';
+      return;
+    }
+
+    $('lista').innerHTML = lista.map(function(p, i){
+      var foto = p.imagem
+        ? '<img class="foto" loading="lazy" src="' + esc(p.imagem) + '" alt="">'
+        : '<div class="foto vazia">🛒</div>';
+      var unid = p.porUnidade ? '<div class="unid">' + brl(p.porUnidade.valor) + ' / ' + p.porUnidade.unidade + '</div>' : '';
+      return '<div class="card' + (i === 0 ? ' melhor' : '') + '">' +
+        (i === 0 ? '<span class="selo">' + (ordem === 'desconto' ? 'Maior desconto' : 'Mais barato') + '</span>' : '') +
+        foto +
+        '<div class="info">' +
+          '<span class="loja"><span class="dot" style="background:' + p.cor + '"></span>' + esc(p.mercado) + '</span>' +
+          '<div class="nome">' + esc(p.nome) + '</div>' +
+          '<div class="precos"><span class="preco">' + brl(p.preco) + '</span>' +
+            (p.de ? '<span class="de">' + brl(p.de) + '</span><span class="off">-' + p.desconto + '%</span>' : '') +
+          '</div>' + unid +
+          (p.disponivel === false ? '<div class="indisp">Indisponível no momento</div>' : '') +
+          (p.link ? '<a class="ver" target="_blank" rel="noopener" href="' + esc(p.link) + '">Ver no site →</a>' : '') +
+        '</div></div>';
+    }).join('');
+  }
+
+  mostrarRecentes();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>

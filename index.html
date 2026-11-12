@@ -78,6 +78,19 @@
     background-size:200% 100%;animation:brilho 1.2s infinite}
   @keyframes brilho{to{background-position:-200% 0}}
   footer{font-size:11px;color:var(--muted);text-align:center;margin-top:20px}
+  .abas{display:flex;gap:6px;margin:12px 0 0}
+  .aba{flex:1;border:0;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:700;cursor:pointer;
+    background:rgba(255,255,255,.12);color:#fff}
+  .aba.on{background:#fff;color:#14532d}
+  .sec{font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.4px}
+  .enc{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:12px 14px;margin:0 0 10px;text-decoration:none;color:var(--ink)}
+  .enc .barra{width:6px;align-self:stretch;border-radius:4px;flex:none}
+  .enc .txt{flex:1;min-width:0}
+  .enc b{display:block;font-size:15px}
+  .enc small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .enc .ir{font-size:13px;font-weight:700;color:var(--brand-2);white-space:nowrap}
+  .aviso{font-size:12px;color:var(--muted);margin:0 0 4px}
 </style>
 </head>
 <body>
@@ -88,9 +101,14 @@
     <button class="buscar" id="btn" type="submit">Buscar</button>
   </form>
   <div class="chips" id="recentes"></div>
+  <div class="abas">
+    <button type="button" class="aba on" data-aba="precos">Preços</button>
+    <button type="button" class="aba" data-aba="encartes">Encartes</button>
+  </div>
 </header>
 
 <main>
+  <div id="viewPrecos">
   <div class="filtros">
     <label class="toggle"><input type="checkbox" id="soPromo"> Só promoções</label>
     <label class="toggle"><input type="checkbox" id="soDisp" checked> Só disponíveis</label>
@@ -106,6 +124,8 @@
     <div class="vazio"><b>Pesquise um produto</b>Os preços dos mercados cadastrados aparecem aqui, do mais barato ao mais caro.</div>
   </div>
   <footer>Preços tirados dos sites das lojas online. Podem variar na loja física. Confira no site antes de comprar.</footer>
+  </div>
+  <div id="viewEncartes" hidden></div>
 </main>
 
 <script>
@@ -174,7 +194,41 @@
   });
   ['soPromo','soDisp','ordem'].forEach(function(id){ $(id).addEventListener('change', desenhar); });
 
+  // ----- abas: Preços / Encartes -----
+  var encartes = null;
+  function mostrarAba(nome){
+    $('viewPrecos').hidden = (nome !== 'precos');
+    $('viewEncartes').hidden = (nome !== 'encartes');
+    document.querySelectorAll('.aba').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-aba') === nome); });
+    if (nome === 'encartes') carregarEncartes();
+    window.scrollTo(0, 0);
+  }
+  document.querySelector('.abas').addEventListener('click', function(e){
+    var b = e.target.closest('[data-aba]'); if (b) mostrarAba(b.getAttribute('data-aba'));
+  });
+  function cartaoEncarte(x){
+    return '<a class="enc" target="_blank" rel="noopener" href="' + esc(x.link) + '">' +
+      '<span class="barra" style="background:' + esc(x.cor) + '"></span>' +
+      '<span class="txt"><b>' + esc(x.nome) + '</b><small>' + esc(x.nota) + '</small></span>' +
+      '<span class="ir">Ver encarte →</span></a>';
+  }
+  function desenharEncartes(){
+    var so = encartes.filter(function(x){ return x.grupo === 'sem-busca'; });
+    var com = encartes.filter(function(x){ return x.grupo !== 'sem-busca'; });
+    $('viewEncartes').innerHTML =
+      '<p class="aviso">O encarte abre no site do próprio mercado, sempre na versão mais recente.</p>' +
+      '<div class="sec">Só em encarte</div>' + so.map(cartaoEncarte).join('') +
+      '<div class="sec">Também na busca de preços</div>' + com.map(cartaoEncarte).join('');
+  }
+  function carregarEncartes(){
+    if (encartes) { desenharEncartes(); return; }
+    $('viewEncartes').innerHTML = '<div class="carregando"><div class="esqueleto"></div><div class="esqueleto"></div></div>';
+    chamar('encartes').then(function(l){ encartes = l; desenharEncartes(); })
+      .catch(function(){ $('viewEncartes').innerHTML = '<div class="vazio"><b>Não consegui carregar os encartes</b>Confira a internet e abra a aba de novo.</div>'; });
+  }
+
   function buscar(t){
+    mostrarAba('precos');
     $('q').blur();
     $('btn').disabled = true;
     $('status').innerHTML = 'Consultando os mercados…';

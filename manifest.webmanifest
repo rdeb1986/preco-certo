@@ -4,7 +4,7 @@
   "description": "Compare preços e promoções de supermercados de Americana e Santa Bárbara d'Oeste",
   "start_url": "./",
   "scope": "./",
-  "display": "browser",
+  "display": "standalone",
   "background_color": "#14532d",
   "theme_color": "#14532d",
   "lang": "pt-BR",

@@ -115,6 +115,7 @@ jobs:
           import android.os.Bundle;
           import android.os.Message;
           import android.webkit.WebChromeClient;
+          import android.webkit.WebResourceError;
           import android.webkit.WebResourceRequest;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
@@ -145,6 +146,15 @@ jobs:
                           if (HOST.equals(u.getHost())) return false;
                           abrirNoNavegador(u);
                           return true;
+                      }
+                      @Override
+                      public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
+                          if (!r.isForMainFrame()) return;
+                          String h = "<html><body style='font-family:sans-serif;padding:24px'>"
+                              + "<h3>Não consegui abrir o Preço Certo</h3>"
+                              + "<p>Motivo: " + e.getDescription() + " (código " + e.getErrorCode() + ")</p>"
+                              + "<p><a href='" + HOME + "'>Tentar de novo</a></p></body></html>";
+                          v.loadDataWithBaseURL("https://" + HOST + "/erro", h, "text/html", "utf-8", null);
                       }
                   });
 

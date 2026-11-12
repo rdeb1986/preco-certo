@@ -8,10 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Preço Certo">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   :root{
     --bg:#f6f4ef; --card:#ffffff; --ink:#1c1f1a; --muted:#6b7064; --line:#e6e2d8;
@@ -135,16 +132,9 @@
 
   function $(id){ return document.getElementById(id); }
 
-  // Abre os sites dos mercados no navegador do celular, fora do app.
-  // No Android, um link "intent://" chama o navegador padrão. Nos demais aparelhos, abre em nova guia.
+  // Links dos mercados: abrem numa guia normal do navegador (o app é só um atalho, não "modo app")
   function abrir(url){
-    var u = String(url || '');
-    var m = /^(https?):\/\/(.+)$/i.exec(u);
-    if (m && /Android/i.test(navigator.userAgent)) {
-      return 'href="' + esc('intent://' + m[2] + '#Intent;scheme=' + m[1].toLowerCase() +
-        ';action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end') + '"';
-    }
-    return 'href="' + esc(u) + '" target="_blank" rel="noopener"';
+    return 'href="' + esc(String(url || '')) + '" target="_blank" rel="noopener"';
   }
   function brl(n){ return 'R$ ' + Number(n).toFixed(2).replace('.', ','); }
   function esc(s){ return String(s || '').replace(/[&<>"']/g, function(c){
